@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthMan", "AuthMan.csproj", "{3782A6EF-3F49-4BA6-AF36-50C8202A682B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3782A6EF-3F49-4BA6-AF36-50C8202A682B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3782A6EF-3F49-4BA6-AF36-50C8202A682B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3782A6EF-3F49-4BA6-AF36-50C8202A682B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3782A6EF-3F49-4BA6-AF36-50C8202A682B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
