@@ -43,6 +43,7 @@ namespace AuthMan
 			switch (e)
 			{
 				case NotSignedIn _:
+					// TODO: make sure we have a renderer available. Otherwise, reraise.
 					_logger.LogDebug(e.ToString());
 					return renderer.Handle(context);
 				/*case NotAuthorized _:
