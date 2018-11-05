@@ -6,7 +6,7 @@ namespace AuthMan
 	public interface IUserMan<TUser> : IAuthenticate<TUser>
 	{
 		TUser Login(HttpContext context);
-	  void Login(HttpContext context, TUser user);
+		void Login(HttpContext context, TUser user);
 		Task<TUser> LoginAsync(HttpContext context);
 		TUser CurrentUser { get; }
 		Task LoadUserAsync(HttpContext context);

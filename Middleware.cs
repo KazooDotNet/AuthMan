@@ -11,7 +11,7 @@ namespace AuthMan
 	{
 		private readonly RequestDelegate _next;
 		private readonly ILogger<AuthenticationMiddleware> _logger;
-		
+
 		public AuthenticationMiddleware(RequestDelegate next, ILogger<AuthenticationMiddleware> logger)
 		{
 			_next = next;
@@ -24,8 +24,8 @@ namespace AuthMan
 			{
 				if (!context.Session.IsAvailable)
 					await context.Session.LoadAsync();
-			  await authMan.Setup(context);
-			  context.Items["authMan"] = authMan;
+				await authMan.Setup(context);
+				context.Items["authMan"] = authMan;
 				await _next(context);
 			}
 			catch (Exception e)
@@ -39,7 +39,7 @@ namespace AuthMan
 			var originalError = e;
 			while (e.InnerException != null)
 				e = e.InnerException;
-			
+
 			switch (e)
 			{
 				case NotSignedIn _:
@@ -56,7 +56,5 @@ namespace AuthMan
 
 			return Task.CompletedTask;
 		}
-		
-		
 	}
 }

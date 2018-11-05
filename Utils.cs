@@ -9,7 +9,6 @@ namespace AuthMan
 {
 	public static class Utils
 	{
-		
 		public static MethodInfo GetMethod(object obj, string methodName, IEnumerable<object> args)
 		{
 			var type = obj.GetType();
@@ -18,22 +17,22 @@ namespace AuthMan
 			return type.GetMethod(methodName, args.Select(a => a?.GetType()).ToArray()) ??
 			       type.GetMethod(methodName);
 		}
-			
+
 
 		public static object CallMethod(object obj, MethodInfo method, IEnumerable<object> args)
 		{
 			var mParams = method.GetParameters();
 			var argCount = args.Count();
-			if (mParams.Length <= argCount) 
+			if (mParams.Length <= argCount)
 				return method.Invoke(obj, args.ToArray());
 			var argList = args.ToList();
 			var count = mParams.Length - argCount;
-			for (var i=0; i < count; i++)
+			for (var i = 0; i < count; i++)
 				argList.Add(Type.Missing);
 			return method.Invoke(obj, argList.ToArray());
 		}
 
-		public static object CallMethod(object obj, string methodName, IEnumerable<object> args, 
+		public static object CallMethod(object obj, string methodName, IEnumerable<object> args,
 			Func<MethodInfo, MethodInfo> configureMethod = null)
 		{
 			var method = GetMethod(obj, methodName, args);
@@ -54,14 +53,15 @@ namespace AuthMan
 					case Task task:
 						await task;
 						return task.GetType().GetProperty("Result")?.GetValue(task);
-					default: 
+					default:
 						return obj;
-				}	
+				}
 			}
 			catch (AggregateException e)
 			{
 				ExceptionDispatchInfo.Capture(e.InnerExceptions.First()).Throw();
 			}
+
 			return default;
 		}
 
@@ -72,14 +72,17 @@ namespace AuthMan
 				switch (obj)
 				{
 					case Task<T> objTask: return await objTask;
-					case Task task:  await task; return null;
+					case Task task:
+						await task;
+						return null;
 					default: return (T?) obj;
-				}	
+				}
 			}
 			catch (AggregateException e)
 			{
 				ExceptionDispatchInfo.Capture(e.InnerExceptions.First()).Throw();
 			}
+
 			return default;
 		}
 	}
