@@ -6,7 +6,7 @@ An extensible, code policy-based authorization manager for DotNet Core.
 Install
 -------
 
-Install the `AuthMan` nuget package. 
+Install the `AuthMan` and `Microsoft.AspNetCore.Session` nuget packages. Sessions are required to persist state.
 
 Setup
 -----
@@ -17,9 +17,12 @@ In the standard Kestrel `Startup.cs` file, add something similar to the followin
     {
         public void ConfigureServices(IServiceCollection services) 
         {
-            services.Authentication<IAuthMan>(opts => {
-                opts.AddUserAuth<IUserMan, User>();
-            });
+            services
+                .AddDistributedMemoryCache();
+                .AddSession()
+                .Authentication<IAuthMan>(opts => {
+                    opts.AddUserAuth<IUserMan, User>();
+                });
         }
         
         public void Configure(IApplicationBuilder app)
