@@ -40,6 +40,7 @@ namespace AuthMan
 		public static IApplicationBuilder UseAuthentication(this IApplicationBuilder app) =>
 			app.UseMiddleware<AuthenticationMiddleware>();
 
+		// TODO: use service instantiation instead of registering all these things? 
 		private static void RegisterClasses(Assembly assembly, IServiceCollection services)
 		{
 			var policyType = typeof(IPolicy);

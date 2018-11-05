@@ -3,11 +3,14 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>7.1</LangVersion>
+        <Version>0.1.0</Version>
+        <Copyright>MIT Jeremy Nicoll</Copyright>
+        <PackageProjectUrl>https://github.com/eltiare/AuthMan</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.3" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.2" />
     </ItemGroup>
 
 </Project>
