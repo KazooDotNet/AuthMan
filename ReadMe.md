@@ -97,12 +97,12 @@ resolve services.
     
     var accounts = await authMan.Scope<AccountPolicy>().ToListAsync();
     
-You can add arguments to Scope() if you need them. Pass those arguments to `Scope<>()`.
+You can add arguments to `YourPolicy#Scope()` if you need them. Pass those arguments to `authMan.Scope<>()`.
         
 
 Extending
-
----------  
+---------
+  
 You don't have to use `AddUserAuth`. You can create your own by implenting IAuthenticate and then calling 
 `AddAuth<IAuthenticate>()` like so:
 
