@@ -5,12 +5,9 @@ namespace AuthMan
 {
 	public class AuthManOptions
 	{
-		public List<Type> Authenticators { get; }
-
-		public AuthManOptions()
-		{
-			Authenticators = new List<Type>();
-		}
+		public List<Type> Authenticators { get; } = new List<Type>();
+		public Type RendererType { get; private set; }
+		public Type AuthMan { get; private set; }
 
 		public AuthManOptions AddUserAuth<TUserMan, TUser>() where TUserMan : IUserMan<TUser>
 		{
@@ -23,5 +20,18 @@ namespace AuthMan
 			Authenticators.Add(typeof(T));
 			return this;
 		}
+
+		public AuthManOptions Renderer<T>() where T : IRenderer
+		{
+			RendererType = typeof(T);
+			return this;
+		}
+
+		public AuthManOptions AuthManClass<T>() where T : IAuthMan
+		{
+			AuthMan = typeof(T);
+			return this;
+		}
+
 	}
 }

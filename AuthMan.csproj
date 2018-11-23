@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>7.1</LangVersion>
-        <Version>0.1.0</Version>
+        <Version>0.1.1</Version>
         <Copyright>MIT Jeremy Nicoll</Copyright>
         <PackageProjectUrl>https://github.com/eltiare/AuthMan</PackageProjectUrl>
     </PropertyGroup>

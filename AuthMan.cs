@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace AuthMan
@@ -33,7 +34,7 @@ namespace AuthMan
 		{
 			foreach (var type in _options.Authenticators)
 			{
-				var auth = (IAuthenticate) _container.GetService(type);
+				var auth = (IAuthenticate) ActivatorUtilities.CreateInstance(_container, type);
 				await auth.Authenticate(context);
 				if (!auth.Authenticated) continue;
 				Authenticator = auth;
@@ -53,13 +54,7 @@ namespace AuthMan
 
 		public Task<bool> Can(Type type, string request = null, params object[] list)
 		{
-			if (!Authenticated())
-				return Task.FromResult(false);
-			if (list.Length == 1 && list[0] != null && list[0].GetType().IsArray)
-				list = (object[]) list[0];
-			var policy = (IPolicy) _container.GetService(type);
-			policy.Authenticator = Authenticator;
-			return policy.Handle(request, list);
+			return !Authenticated() ? Task.FromResult(false) : GetPolicy(type).Handle(request, list);
 		}
 
 		public void EnsureAuthenticated()
@@ -78,24 +73,31 @@ namespace AuthMan
 		public IQueryable<TQueriable> Scope<TPolicy, TQueriable>(params object[] args)
 		{
 			return (IQueryable<TQueriable>)
-				Utils.CallMethod(GetPolicy<TPolicy>(), "Scope", args);
+				Utils.CallMethod(GetPolicyOrRaise<TPolicy>(), "Scope", args);
 		}
 
 		public async Task<IQueryable<TQueriable>> ScopeAsync<TPolicy, TQueriable>(params object[] args)
 		{
 			return await Utils.ExtractRefTask<IQueryable<TQueriable>>(
-				Utils.CallMethod(GetPolicy<TPolicy>(), "ScopeAsync", args)
+				Utils.CallMethod(GetPolicyOrRaise<TPolicy>(), "ScopeAsync", args)
 			);
 		}
 
 		private IPolicy GetPolicy<TPolicy>() => GetPolicy(typeof(TPolicy));
 
 		private IPolicy GetPolicy(Type type)
-		{
-			EnsureAuthenticated();
-			var policy = (IPolicy) _container.GetService(type);
+		{	
+			var policy = (IPolicy) ActivatorUtilities.CreateInstance(_container, type);
 			policy.Authenticator = Authenticator;
 			return policy;
+		}
+
+		private IPolicy GetPolicyOrRaise<TPolicy>() => GetPolicyOrRaise(typeof(TPolicy));
+
+		private IPolicy GetPolicyOrRaise(Type type)
+		{
+			EnsureAuthenticated();
+			return GetPolicy(type);
 		}
 	}
 }

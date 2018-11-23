@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using AuthMan.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AuthMan
 {
@@ -18,44 +19,36 @@ namespace AuthMan
 			_logger = logger;
 		}
 
-		public async Task Invoke(HttpContext context, IAuthMan authMan, IRenderer renderer)
+		public async Task Invoke(HttpContext context, IOptions<AuthManOptions> optsThing, IServiceProvider provider)
 		{
+			var opts = optsThing.Value;
 			try
 			{
 				if (!context.Session.IsAvailable)
 					await context.Session.LoadAsync();
+				var authMan = (IAuthMan) ActivatorUtilities.CreateInstance(provider, opts.AuthMan ?? typeof(AuthMan));
 				await authMan.Setup(context);
 				context.Items["authMan"] = authMan;
 				await _next(context);
 			}
 			catch (Exception e)
 			{
-				await RescueFromException(e, context, renderer);
+				while (e.InnerException != null)
+					e = e.InnerException;
+				switch (e)
+				{
+					case NotSignedIn _:
+					case NotAuthorized _:
+						_logger.LogDebug(e.ToString());
+						if (opts.RendererType == null) throw;
+						var renderer = ActivatorUtilities.CreateInstance<IRenderer>(provider);
+						await renderer.Handle(context);
+						return;
+					default:
+						throw;
+				}
 			}
 		}
-
-		private Task RescueFromException(Exception e, HttpContext context, IRenderer renderer)
-		{
-			var originalError = e;
-			while (e.InnerException != null)
-				e = e.InnerException;
-
-			switch (e)
-			{
-				case NotSignedIn _:
-					// TODO: make sure we have a renderer available. Otherwise, reraise.
-					_logger.LogDebug(e.ToString());
-					return renderer.Handle(context);
-				/*case NotAuthorized _:
-					Console.WriteLine(e);
-					context.Response.StatusCode = 403;
-					break;*/
-				default:
-					ExceptionDispatchInfo.Capture(originalError).Throw();
-					break;
-			}
-
-			return Task.CompletedTask;
-		}
+		
 	}
 }
