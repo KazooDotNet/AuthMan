@@ -7,13 +7,14 @@ namespace AuthMan
 {
 	public static class Extensions
 	{
-		public static IServiceCollection AddAuthentication(this IServiceCollection services, Action<AuthManOptions> action)
+		public static IServiceCollection AddAuthMan(this IServiceCollection services, Action<AuthManOptions> action)
 		{
 			services.Configure(action);
+			services.AddTransient(typeof(AuthManActivator<>));
 			return services;
 		}
 
-		public static IApplicationBuilder UseAuthentication(this IApplicationBuilder app) =>
+		public static IApplicationBuilder UseAuthMan(this IApplicationBuilder app) =>
 			app.UseMiddleware<AuthenticationMiddleware>();
 		
 	}

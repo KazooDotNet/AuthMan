@@ -41,7 +41,7 @@ namespace AuthMan
 				break;
 			}
 		}
-
+		
 		public bool Authenticated() =>
 			Authenticator != null;
 
@@ -54,7 +54,10 @@ namespace AuthMan
 
 		public Task<bool> Can(Type type, string request = null, params object[] list)
 		{
-			return !Authenticated() ? Task.FromResult(false) : GetPolicy(type).Handle(request, list);
+			var policy = GetPolicy(type);
+			var before = policy.Before();
+			if (before != null) return Task.FromResult((bool)before);
+			return !Authenticated() ? Task.FromResult(false) : policy.Handle(request, list);
 		}
 
 		public void EnsureAuthenticated()
@@ -70,13 +73,14 @@ namespace AuthMan
 				throw new Exceptions.NotAuthorized();
 		}
 
-		public IQueryable<TQueriable> Scope<TPolicy, TQueriable>(params object[] args)
+		public IQueryable<TQueriable> Scope<TPolicy, TQueriable>(params object[] args) where TPolicy : IPolicy
 		{
-			return (IQueryable<TQueriable>)
-				Utils.CallMethod(GetPolicyOrRaise<TPolicy>(), "Scope", args);
+			var policy = GetPolicyOrRaise<TPolicy>();
+			policy.Before();
+			return (IQueryable<TQueriable>) Utils.CallMethod(policy, "Scope", args);
 		}
 
-		public async Task<IQueryable<TQueriable>> ScopeAsync<TPolicy, TQueriable>(params object[] args)
+		public async Task<IQueryable<TQueriable>> ScopeAsync<TPolicy, TQueriable>(params object[] args) where TPolicy : IPolicy
 		{
 			return await Utils.ExtractRefTask<IQueryable<TQueriable>>(
 				Utils.CallMethod(GetPolicyOrRaise<TPolicy>(), "ScopeAsync", args)

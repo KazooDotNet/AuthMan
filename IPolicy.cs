@@ -6,5 +6,6 @@ namespace AuthMan
 	{
 		IAuthenticate Authenticator { get; set; }
 		Task<bool> Handle(string request, params object[] list);
+		bool? Before();
 	}
 }

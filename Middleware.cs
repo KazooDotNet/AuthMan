@@ -41,7 +41,7 @@ namespace AuthMan
 					case NotAuthorized _:
 						_logger.LogDebug(e.ToString());
 						if (opts.RendererType == null) throw;
-						var renderer = ActivatorUtilities.CreateInstance<IRenderer>(provider);
+						var renderer = (IRenderer) ActivatorUtilities.CreateInstance(provider, opts.RendererType);
 						await renderer.Handle(context);
 						return;
 					default:
