@@ -27,9 +27,13 @@ namespace AuthMan
 				if (!context.Session.IsAvailable)
 					await context.Session.LoadAsync();
 				var authMan = (IAuthMan) ActivatorUtilities.CreateInstance(provider, opts.AuthMan ?? typeof(AuthMan));
-				await authMan.Setup(context);
-				context.Items["authMan"] = authMan;
-				await _next(context);
+				var resp = await authMan.Setup(context);
+				// Cancel any further requests if null
+				if (resp != null) 
+				{
+					context.Items["authMan"] = authMan;
+					await _next(context);	
+				}
 			}
 			catch (Exception e)
 			{

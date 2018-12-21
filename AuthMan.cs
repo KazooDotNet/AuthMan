@@ -9,7 +9,7 @@ namespace AuthMan
 {
 	public interface IAuthMan
 	{
-		Task Setup(HttpContext context);
+		Task<bool?> Setup(HttpContext context);
 		bool Authenticated();
 		void EnsureAuthenticated();
 		Task<bool> Can<T>(string action, params object[] list);
@@ -30,16 +30,19 @@ namespace AuthMan
 			_options = options.Value;
 		}
 
-		public async Task Setup(HttpContext context)
+		public async Task<bool?> Setup(HttpContext context)
 		{
 			foreach (var type in _options.Authenticators)
 			{
 				var auth = (IAuthenticate) ActivatorUtilities.CreateInstance(_container, type);
-				await auth.Authenticate(context);
-				if (!auth.Authenticated) continue;
+				var resp = await auth.Authenticate(context);
+				if (resp == null)
+					return null;
+				if (!resp.Value) continue;
 				Authenticator = auth;
-				break;
+				return true;
 			}
+			return false;
 		}
 		
 		public bool Authenticated() =>
@@ -52,12 +55,12 @@ namespace AuthMan
 		public Task<bool> Can<TPolicy>(string request = null, params object[] list)
 			=> Can(typeof(TPolicy), request, list);
 
-		public Task<bool> Can(Type type, string request = null, params object[] list)
+		public async Task<bool> Can(Type type, string request = null, params object[] list)
 		{
 			var policy = GetPolicy(type);
-			var before = policy.Before();
-			if (before != null) return Task.FromResult((bool)before);
-			return !Authenticated() ? Task.FromResult(false) : policy.Handle(request, list);
+			var before = await policy.Before();
+			if (before != null) return (bool)before;
+			return Authenticated() && await policy.Handle(request, list);
 		}
 
 		public void EnsureAuthenticated()

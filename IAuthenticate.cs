@@ -5,8 +5,8 @@ namespace AuthMan
 {
   public interface IAuthenticate
   {
-    Task<bool> Authenticate(HttpContext context);
-    bool Authenticated { get; }
+    Task<bool?> Authenticate(HttpContext context);
+    bool? Authenticated { get; }
   }
   
   public interface IAuthenticate<out T> : IAuthenticate
