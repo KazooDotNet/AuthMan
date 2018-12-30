@@ -15,7 +15,7 @@ namespace AuthMan
 				return false;
 			var handleMethod = Utils.GetMethod(this, request, list);
 			if (handleMethod == null)
-				throw new ArgumentException($"{request} does not exist");
+				throw new ArgumentException($"{request} does not exist on {GetType().FullName}");
 			return (bool) await GetResponse(handleMethod, list);
 		}
 
