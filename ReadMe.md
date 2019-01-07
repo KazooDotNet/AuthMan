@@ -20,7 +20,7 @@ In the standard Kestrel `Startup.cs` file, add something similar to the followin
             services
                 .AddDistributedMemoryCache();
                 .AddSession()
-                .Authentication(opts => {
+                .AddAuthMan(opts => {
                     opts.AuthManClass<IAuthMan>() // optional, defaults to using AuthMan.AuthMan
                     opts.AddUserAuth<IUserMan, User>();
                 });
@@ -28,7 +28,9 @@ In the standard Kestrel `Startup.cs` file, add something similar to the followin
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseAuthentication();
+            app
+		.UseSession()
+		.UseAuthMann();
         }
     }
 
