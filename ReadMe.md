@@ -41,7 +41,7 @@ add some  convenience methods, or just remove the `AuthManClass` method to use t
 Usage
 -----
 
-The middleware (added by `UseAuthentication()` above), puts an instance of `IAuthMan` in the `Items` property
+The middleware (added by `UseAuthMan()` above), puts an instance of `IAuthMan` in the `Items` property
 of `HttpContext`. The key is `authMan`. Example:
 
     var authMan = (AuthMan) httpContext.Items["authMan"];
