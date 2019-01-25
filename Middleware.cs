@@ -24,8 +24,15 @@ namespace AuthMan
 			var opts = optsThing.Value;
 			try
 			{
-				if (!context.Session.IsAvailable)
-					await context.Session.LoadAsync();
+				try
+				{
+					if (!context.Session.IsAvailable)
+						await context.Session.LoadAsync();
+				}
+				catch (InvalidOperationException)
+				{
+					_logger.LogWarning("Session is not available. Any authenticators that rely on the session will fail.");
+				}
 				var authMan = (IAuthMan) ActivatorUtilities.CreateInstance(provider, opts.AuthMan ?? typeof(AuthMan));
 				var resp = await authMan.Setup(context);
 				// Cancel any further requests if null
