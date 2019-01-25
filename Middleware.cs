@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AuthMan.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,15 +25,8 @@ namespace AuthMan
 			var opts = optsThing.Value;
 			try
 			{
-				try
-				{
-					if (!context.Session.IsAvailable)
-						await context.Session.LoadAsync();
-				}
-				catch (InvalidOperationException)
-				{
-					_logger.LogWarning("Session is not available. Any authenticators that rely on the session will fail.");
-				}
+				if (context.Features.Get<ISessionFeature>() != null && !context.Session.IsAvailable)
+					await context.Session.LoadAsync();
 				var authMan = (IAuthMan) ActivatorUtilities.CreateInstance(provider, opts.AuthMan ?? typeof(AuthMan));
 				var resp = await authMan.Setup(context);
 				// Cancel any further requests if null
