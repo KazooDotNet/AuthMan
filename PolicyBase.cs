@@ -19,7 +19,7 @@ namespace AuthMan
 			return (bool) await GetResponse(handleMethod, list);
 		}
 
-		public virtual Task<bool?> Before() => null;
+		public virtual Task<bool?> Before() => Task.FromResult<bool?>(null);
 
 		private Task<bool?> GetResponse(MethodInfo method, IEnumerable<object> list)
 			=> Utils.ExtractValTask<bool>(Utils.CallMethod(this, method, list));
