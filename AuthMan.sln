@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthMan", "AuthMan.csproj", "{3782A6EF-3F49-4BA6-AF36-50C8202A682B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{417B65C9-E87F-491C-A309-5F73BFD058F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{3782A6EF-3F49-4BA6-AF36-50C8202A682B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3782A6EF-3F49-4BA6-AF36-50C8202A682B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3782A6EF-3F49-4BA6-AF36-50C8202A682B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{417B65C9-E87F-491C-A309-5F73BFD058F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{417B65C9-E87F-491C-A309-5F73BFD058F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{417B65C9-E87F-491C-A309-5F73BFD058F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{417B65C9-E87F-491C-A309-5F73BFD058F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

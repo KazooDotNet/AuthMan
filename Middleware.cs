@@ -23,35 +23,14 @@ namespace AuthMan
 		public async Task Invoke(HttpContext context, IOptions<AuthManOptions> optsThing, IServiceProvider provider)
 		{
 			var opts = optsThing.Value;
-			try
+			if (context.Features.Get<ISessionFeature>() != null && !context.Session.IsAvailable)
+				await context.Session.LoadAsync();
+			var authMan = (IAuthMan) ActivatorUtilities.CreateInstance(provider, opts.AuthMan ?? typeof(AuthMan));
+			var resp = await authMan.Setup(context);
+			if (resp != null) // Cancel any further requests if null 
 			{
-				if (context.Features.Get<ISessionFeature>() != null && !context.Session.IsAvailable)
-					await context.Session.LoadAsync();
-				var authMan = (IAuthMan) ActivatorUtilities.CreateInstance(provider, opts.AuthMan ?? typeof(AuthMan));
-				var resp = await authMan.Setup(context);
-				// Cancel any further requests if null
-				if (resp != null) 
-				{
-					context.Items["authMan"] = authMan;
-					await _next(context);	
-				}
-			}
-			catch (Exception e)
-			{
-				while (e.InnerException != null)
-					e = e.InnerException;
-				switch (e)
-				{
-					case NotSignedIn _:
-					case NotAuthorized _:
-						_logger.LogDebug(e.ToString());
-						if (opts.RendererType == null) throw;
-						var renderer = (IRenderer) ActivatorUtilities.CreateInstance(provider, opts.RendererType);
-						await renderer.Handle(context);
-						return;
-					default:
-						throw;
-				}
+				context.Items["authMan"] = authMan;
+				await _next(context);
 			}
 		}
 		

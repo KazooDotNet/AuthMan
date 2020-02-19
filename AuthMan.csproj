@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>7.1</LangVersion>
-        <Version>0.2.1.4</Version>
+        <Version>0.2.2</Version>
         <Copyright>MIT Jeremy Nicoll</Copyright>
         <License>MIT</License>
         <PackageProjectUrl>https://github.com/KazooDotNet/AuthMan</PackageProjectUrl>
@@ -12,6 +12,18 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.3" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Tests\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Tests\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Tests\**" />
     </ItemGroup>
 
 </Project>

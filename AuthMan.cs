@@ -12,9 +12,11 @@ namespace AuthMan
 		Task<bool?> Setup(HttpContext context);
 		bool Authenticated();
 		void EnsureAuthenticated();
-		Task<bool> Can<T>(string action, params object[] list);
+		Task<bool> Can<T>(Func<T, object> del) where T : IPolicy;
+		Task<bool> Can<T>(string action, params object[] list) where T : IPolicy;
 		Task<bool> Can(Type type, string action, params object[] list);
-		Task Authenticate<T>(string action, params object[] list);
+		Task Authenticate<T>(string action, params object[] list) where T : IPolicy;
+		Task Authenticate<T>(Func<T, object> del) where T : IPolicy;
 		IAuthenticate Authenticator { get; }
 	}
 
@@ -22,12 +24,19 @@ namespace AuthMan
 	{
 		private readonly IServiceProvider _container;
 		private readonly AuthManOptions _options;
+
 		public IAuthenticate Authenticator { get; private set; }
 
 		public AuthMan(IServiceProvider container, IOptions<AuthManOptions> options)
 		{
 			_container = container;
 			_options = options.Value;
+		}
+
+		public AuthMan(IServiceProvider container, AuthManOptions options)
+		{
+			_container = container;
+			_options = options;
 		}
 
 		public async Task<bool?> Setup(HttpContext context)
@@ -49,6 +58,14 @@ namespace AuthMan
 			Authenticator != null;
 
 
+		public async Task<bool> Can<T>(Func<T, object> del) where T : IPolicy
+		{
+			var policy = GetPolicy<T>();
+			var before = await policy.Before();
+			if (before != null) return (bool)before;
+			return await Utils.ExtractRefTask<bool>(del(policy));
+		}
+
 		Task<bool> IAuthMan.Can<T>(string request, params object[] list)
 			=> Can(typeof(T), request, list);
 
@@ -69,10 +86,16 @@ namespace AuthMan
 				throw new Exceptions.NotSignedIn();
 		}
 
-		public async Task Authenticate<TPolicy>(string request = null, params object[] list)
+		public async Task Authenticate<TPolicy>(string request = null, params object[] list) where TPolicy : IPolicy
 		{
 			EnsureAuthenticated();
 			if (!await Can(typeof(TPolicy), request, list))
+				throw new Exceptions.NotAuthorized();
+		}
+		
+		public async Task Authenticate<T>(Func<T, object> del) where T : IPolicy
+		{
+			if (!await Can(del))
 				throw new Exceptions.NotAuthorized();
 		}
 
@@ -90,7 +113,7 @@ namespace AuthMan
 			);
 		}
 
-		private IPolicy GetPolicy<TPolicy>() => GetPolicy(typeof(TPolicy));
+		private TPolicy GetPolicy<TPolicy>() where TPolicy : IPolicy => (TPolicy) GetPolicy(typeof(TPolicy));
 
 		private IPolicy GetPolicy(Type type)
 		{	
@@ -99,7 +122,7 @@ namespace AuthMan
 			return policy;
 		}
 
-		private IPolicy GetPolicyOrRaise<TPolicy>() => GetPolicyOrRaise(typeof(TPolicy));
+		private TPolicy GetPolicyOrRaise<TPolicy>() => (TPolicy) GetPolicyOrRaise(typeof(TPolicy));
 
 		private IPolicy GetPolicyOrRaise(Type type)
 		{

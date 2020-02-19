@@ -10,7 +10,6 @@ namespace AuthMan
 		public static IServiceCollection AddAuthMan(this IServiceCollection services, Action<AuthManOptions> action)
 		{
 			services.Configure(action);
-			services.AddTransient(typeof(AuthManActivator<>));
 			return services;
 		}
 
